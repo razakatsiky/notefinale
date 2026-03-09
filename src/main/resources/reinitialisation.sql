@@ -1,0 +1,17 @@
+SET FOREIGN_KEY_CHECKS = 0;
+
+TRUNCATE TABLE note;
+TRUNCATE TABLE parametre;
+TRUNCATE TABLE correcteur;
+TRUNCATE TABLE matiere;
+TRUNCATE TABLE candidat;
+TRUNCATE TABLE resolution;
+TRUNCATE TABLE operateur;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+
+
+DROP DATABASE IF EXISTS note_finale;
+CREATE DATABASE note_finale;
+USE note_finale;
