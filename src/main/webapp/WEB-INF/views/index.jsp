@@ -368,6 +368,7 @@ label {
 </head>
 <body>
     <div class="header">
+        <!-- <h2>ETU3637</h2> -->
         <h1>Système de Calcul de Notes Finales</h1>
     </div>
     
@@ -375,6 +376,7 @@ label {
         
         <div class="navbar">
         <div class="navbar-links">
+            <h2>ETU3637</h2>
             <a href="/candidats" class="nav-button">Candidats</a>
             <a href="/matieres" class="nav-button">Matières</a>
             <a href="/correcteurs" class="nav-button">Correcteurs</a>
