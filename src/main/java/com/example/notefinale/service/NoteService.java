@@ -132,8 +132,10 @@ public class NoteService {
     private Double appliquerResolution(List<Double> notes, String resolutionNom) {
         switch (resolutionNom.toLowerCase()) {
             case "plus petite":
+            case "petit":
                 return notes.stream().min(Double::compare).orElse(notes.get(0));
             case "plus grande":
+            case "grand":
                 return notes.stream().max(Double::compare).orElse(notes.get(0));
             case "moyenne":
                 return notes.stream().mapToDouble(Double::doubleValue).average().orElse(notes.get(0));
