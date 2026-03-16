@@ -75,6 +75,7 @@ spring-boot-devtools.properties
 # Application specific
 application-dev.properties
 application-prod.properties
+application.properties
 
 # Database
 *.db
