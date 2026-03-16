@@ -11,6 +11,7 @@ import javax.persistence.PersistenceContext;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 @Service
@@ -73,27 +74,21 @@ public class NoteService {
             return valeursNotes.stream().mapToDouble(Double::doubleValue).average().orElse(valeursNotes.get(0));
         }
         
-        for (Parametre parametre : parametres) {
-            String operateur = parametre.getOperateur().getOperateur();
-            int differenceParametre = parametre.getDifference();
-            String resolution = parametre.getResolution().getNom();
-            
-            logger.info("Test condition: {} {} {}", differenceTotale, operateur, differenceParametre);
-            
-            boolean condition = evaluerCondition(differenceTotale, operateur, differenceParametre);
-            
-            if (condition) {
-                logger.info("Condition remplie, application de la résolution: {}", resolution);
-                Double resultat = appliquerResolution(valeursNotes, resolution);
-                logger.info("Résultat final: {}", resultat);
-                return resultat;
-            }
+        // Logique complète : trouver le paramètre éligible le plus proche
+        Parametre parametreChoisi = trouverParametreEligibleLePlusProche(parametres, differenceTotale);
+        
+        if (parametreChoisi == null) {
+            logger.info("Aucun paramètre éligible trouvé, retour de la moyenne par défaut");
+            return valeursNotes.stream().mapToDouble(Double::doubleValue).average().orElse(valeursNotes.get(0));
         }
         
-        logger.info("Aucune condition remplie, retour de la moyenne par défaut");
-        Double moyenne = valeursNotes.stream().mapToDouble(Double::doubleValue).average().orElse(valeursNotes.get(0));
-        logger.info("Moyenne calculée: {}", moyenne);
-        return moyenne;
+        logger.info("Paramètre choisi: différence={}, résolution={}", 
+            parametreChoisi.getDifference(), 
+            parametreChoisi.getResolution().getNom());
+        
+        Double resultat = appliquerResolution(valeursNotes, parametreChoisi.getResolution().getNom());
+        logger.info("Résultat final: {}", resultat);
+        return resultat;
     }
     
     private boolean toutesNotesIdentiques(List<Double> notes) {
@@ -102,14 +97,80 @@ public class NoteService {
         return notes.stream().allMatch(note -> note == premiereNote);
     }
     
-    private double calculerDifferenceTotale(List<Double> notes) {
-        double differenceTotale = 0;
-        for (int i = 0; i < notes.size(); i++) {
-            for (int j = i + 1; j < notes.size(); j++) {
-                differenceTotale += Math.abs(notes.get(i) - notes.get(j));
+    private Parametre trouverParametreEligibleLePlusProche(List<Parametre> parametres, double differenceTotale) {
+        List<Parametre> parametresEligibles = new ArrayList<>();
+        
+        logger.info("Recherche des paramètres éligibles pour différence totale: {}", differenceTotale);
+        
+        // Étape 1 : Filtrer les paramètres éligibles
+        for (Parametre parametre : parametres) {
+            String operateur = parametre.getOperateur().getOperateur();
+            int differenceParametre = parametre.getDifference();
+            
+            boolean condition = evaluerCondition(differenceTotale, operateur, differenceParametre);
+            
+            logger.info("Test paramètre différence={} avec opérateur '{}': {}", 
+                differenceParametre, operateur, condition ? "ÉLIGIBLE" : "non éligible");
+            
+            if (condition) {
+                parametresEligibles.add(parametre);
             }
         }
-        return differenceTotale;
+        
+        if (parametresEligibles.isEmpty()) {
+            logger.info("Aucun paramètre éligible trouvé");
+            return null;
+        }
+        
+        logger.info("Paramètres éligibles trouvés: {}", parametresEligibles.size());
+        
+        // Étape 2 : Parmi les éligibles, trouver le plus proche
+        Parametre parametreLePlusProche = parametresEligibles.get(0);
+        double ecartMin = Math.abs(parametresEligibles.get(0).getDifference() - differenceTotale);
+        
+        for (Parametre parametre : parametresEligibles) {
+            double ecartActuel = Math.abs(parametre.getDifference() - differenceTotale);
+            
+            logger.info("Paramètre différence={}, écart={}", parametre.getDifference(), ecartActuel);
+            
+            if (ecartActuel < ecartMin) {
+                ecartMin = ecartActuel;
+                parametreLePlusProche = parametre;
+                logger.info("Nouvel écart minimum trouvé: {} pour le paramètre {}", ecartMin, parametre.getDifference());
+            } else if (ecartActuel == ecartMin && parametre.getDifference() < parametreLePlusProche.getDifference()) {
+                parametreLePlusProche = parametre;
+                logger.info("Égalité d'écart, sélection du paramètre le plus petit: {}", parametre.getDifference());
+            }
+        }
+        
+        logger.info("Paramètre le plus proche sélectionné: différence={}", parametreLePlusProche.getDifference());
+        return parametreLePlusProche;
+    }
+    
+    private Double trouverNoteLaPlusProche(List<Double> notes, int differenceParametre) {
+        Double noteLaPlusProche = notes.get(0);
+        double ecartMin = Math.abs(notes.get(0) - differenceParametre);
+        
+        logger.info("Recherche de la note la plus proche de {}", differenceParametre);
+        
+        for (int i = 0; i < notes.size(); i++) {
+            Double noteActuelle = notes.get(i);
+            double ecartActuel = Math.abs(noteActuelle - differenceParametre);
+            
+            logger.info("Note: {}, écart: {}", noteActuelle, ecartActuel);
+            
+            if (ecartActuel < ecartMin) {
+                ecartMin = ecartActuel;
+                noteLaPlusProche = noteActuelle;
+                logger.info("Nouvel écart minimum trouvé: {} pour la note {}", ecartMin, noteLaPlusProche);
+            } else if (ecartActuel == ecartMin && noteActuelle < noteLaPlusProche) {
+                noteLaPlusProche = noteActuelle;
+                logger.info("Égalité d'écart, sélection de la note la plus petite: {}", noteLaPlusProche);
+            }
+        }
+        
+        logger.info("Note finale sélectionnée: {}", noteLaPlusProche);
+        return noteLaPlusProche;
     }
     
     private boolean evaluerCondition(double differenceTotale, String operateur, int differenceParametre) {
@@ -142,6 +203,16 @@ public class NoteService {
             default:
                 return notes.get(0);
         }
+    }
+    
+    private double calculerDifferenceTotale(List<Double> notes) {
+        double differenceTotale = 0;
+        for (int i = 0; i < notes.size(); i++) {
+            for (int j = i + 1; j < notes.size(); j++) {
+                differenceTotale += Math.abs(notes.get(i) - notes.get(j));
+            }
+        }
+        return differenceTotale;
     }
     
     public List<Note> getNotesByCandidat(Long candidatId) {

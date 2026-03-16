@@ -383,6 +383,7 @@ label {
         
         <form action="/calculer-note" method="post">
             <div class="form-group">
+                <h1>ETU3637</h1>
                 <label for="candidatId">Candidat:</label>
                 <select name="candidatId" id="candidatId" required>
                     <option value="">-- Sélectionner un candidat --</option>
