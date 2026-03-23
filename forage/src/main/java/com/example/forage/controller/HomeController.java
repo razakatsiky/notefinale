@@ -1,0 +1,18 @@
+package com.example.forage.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/forage")
+public class HomeController {
+    
+    @GetMapping
+    public String home(Model model) {
+        model.addAttribute("title", "Accueil - Système de Forage");
+        model.addAttribute("message", "Bienvenue dans le système de gestion du forage");
+        return "forage/index";
+    }
+}
