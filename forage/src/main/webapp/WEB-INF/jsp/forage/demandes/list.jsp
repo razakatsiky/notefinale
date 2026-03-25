@@ -378,6 +378,7 @@ label {
             <a href="/forage">Accueil</a>
             <a href="/forage/clients">Clients</a>
             <a href="/forage/demandes">Demandes</a>
+            <a href="/forage/statuts">Statuts</a>
         </div>
         
         <div class="actions">
@@ -405,9 +406,11 @@ label {
                         <tr>
                             <th>ID</th>
                             <th>Client</th>
-                            <th>Date</th>
+                            <!-- <th>Date</th> -->
                             <th>Lieu</th>
                             <th>Description</th>
+                            <th>Statut</th>
+                            <th>Date Statut</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -416,9 +419,17 @@ label {
                             <tr>
                                 <td>${demande.id}</td>
                                 <td>${demande.client.nom}</td>
-                                <td>${demande.dateDemande}</td>
+                                <!-- <td>${demande.dateDemande}</td> -->
                                 <td>${demande.lieu}</td>
                                 <td class="description" title="${demande.description}">${demande.description}</td>
+                                <td>
+                                    <span style="background-color: #e8f5e8; padding: 4px 8px; border-radius: 4px; font-size: 0.9em;">
+                                        ${statutsMap[demande.id]}
+                                    </span>
+                                </td>
+                                <td>
+                                    ${datesMap[demande.id]}
+                                </td>
                                 <td>
                                     <a href="/forage/demandes/edit/${demande.id}" class="btn btn-warning">Modifier</a>
                                     <a href="/forage/demandes/delete/${demande.id}" 

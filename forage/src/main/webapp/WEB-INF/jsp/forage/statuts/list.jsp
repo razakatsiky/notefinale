@@ -50,10 +50,15 @@ body {
 }
 
 .navbar {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
     text-align: right;
     border-bottom: 1px solid rgba(0, 0, 0, 0.08);
     background: white;
     padding: 8px 32px;
+    z-index: 999;
 }
 
 .navbar-links {
@@ -107,7 +112,7 @@ body {
 }
 
 .main-content {
-    margin-top: 120px;
+    margin-top: 180px;
     padding: 40px 32px;
     max-width: 900px;
     margin-left: auto;
@@ -248,6 +253,16 @@ input:focus, textarea:focus, select:focus {
     color: white;
 }
 
+.btn-warning {
+    border: 1px solid #f39c12;
+    color: #f39c12;
+}
+
+.btn-warning:hover {
+    background-color: #f39c12;
+    color: white;
+}
+
 .form-group {
     margin-bottom: 20px;
 }
@@ -280,47 +295,42 @@ label {
     color: #e74c3c;
 }
 
-.result {
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    margin-top: 20px;
+.alert {
+    padding: 16px 20px;
     border-radius: 8px;
+    margin-bottom: 20px;
+    font-weight: 500;
 }
 
-.note-finale {
-    font-size: 24px;
-    font-weight: bold;
-    text-align: center;
-    margin: 20px 0;
+.alert-success {
+    border-left: 4px solid #27ae60;
+    background: rgba(39, 174, 96, 0.1);
+    color: #27ae60;
 }
 
-.notes-list {
-    margin-top: 20px;
-}
-
-.note-item {
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    padding: 10px;
-    margin: 5px 0;
-    border-left: 2px solid black;
-    border-radius: 4px;
-}
-
-.back-link {
-    display: inline-block;
-    margin-top: 20px;
-    color: black;
-    text-decoration: none;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.3);
-    transition: border-color 0.2s ease;
-}
-
-.back-link:hover {
-    border-bottom-color: black;
+.alert-danger {
+    border-left: 4px solid #e74c3c;
+    background: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
 }
 
 .actions {
     white-space: nowrap;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-state h3 {
+    color: #666;
+    margin-bottom: 16px;
+}
+
+.empty-state p {
+    color: #999;
+    margin-bottom: 24px;
 }
 
 /* Responsive */
@@ -365,52 +375,69 @@ label {
 <body>
     <div class="container">
         <div class="header">
-            <h1>${title}</h1>
+            <h1>Gestion des Statuts</h1>
         </div>
         
-        <div class="nav">
-            <a href="/forage">Accueil</a>
-            <a href="/forage/clients">Clients</a>
-            <a href="/forage/demandes">Demandes</a>
+        <div class="navbar">
+            <div class="navbar-links">
+                <a href="/forage" class="nav-button">Accueil</a>
+                <a href="/forage/clients" class="nav-button">Clients</a>
+                <a href="/forage/demandes" class="nav-button">Demandes</a>
+                <a href="/forage/statuts" class="nav-button">Statuts</a>
+            </div>
         </div>
         
-        <form action="/forage/demandes" method="post">
-            <c:if test="${demande.id != null}">
-                <input type="hidden" name="id" value="${demande.id}">
+        <div class="main-content">
+            <div class="actions">
+                <a href="/forage/statuts/new" class="btn btn-success">Ajouter un Statut</a>
+            </div>
+            
+            <c:if test="${not empty success}">
+                <div class="alert alert-success">${success}</div>
+            </c:if>
+            <c:if test="${not empty error}">
+                <div class="alert alert-danger">${error}</div>
             </c:if>
             
-            <div class="form-group">
-                <label for="clientId">Client *</label>
-                <select id="clientId" name="clientId" required>
-                    <option value="">Sélectionnez un client</option>
-                    <c:forEach var="client" items="${clients}">
-                        <option value="${client.id}" ${not empty demande.client and demande.client.id == client.id ? 'selected' : ''}>
-                            ${client.nom}
-                        </option>
-                    </c:forEach>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="dateDemande">Date de la demande</label>
-                <input type="date" id="dateDemande" name="dateDemande" required value="${demande.dateDemande}">
-            </div>
-            
-            <div class="form-group">
-                <label for="lieu">Lieu *</label>
-                <input type="text" id="lieu" name="lieu" value="${demande.lieu}" required placeholder="Entrez le lieu du forage">
-            </div>
-            
-            <div class="form-group">
-                <label for="description">Description</label>
-                <textarea id="description" name="description" placeholder="Décrivez la demande de forage...">${demande.description}</textarea>
-            </div>
-            
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Enregistrer</button>
-                <a href="/forage/demandes" class="btn btn-secondary">Annuler</a>
-            </div>
-        </form>
+            <c:choose>
+                <c:when test="${empty statuts}">
+                    <div class="empty-state">
+                        <h3>Aucun statut trouvé</h3>
+                        <p>Commencez par ajouter votre premier statut.</p>
+                        <a href="/forage/statuts/new" class="btn btn-success">Ajouter un statut</a>
+                    </div>
+                </c:when>
+                <c:otherwise>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nom</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:forEach var="statut" items="${statuts}">
+                                <tr>
+                                    <td>${statut.id}</td>
+                                    <td>
+                                        <span style="background-color: #f0f0f0; padding: 4px 8px; border-radius: 4px; font-weight: 500;">
+                                            ${statut.nom}
+                                        </span>
+                                    </td>
+                                    <td class="actions">
+                                        <a href="/forage/statuts/edit/${statut.id}" class="btn btn-warning">Modifier</a>
+                                        <a href="/forage/statuts/delete/${statut.id}" 
+                                           class="btn btn-danger" 
+                                           onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce statut ?')">Supprimer</a>
+                                    </td>
+                                </tr>
+                            </c:forEach>
+                        </tbody>
+                    </table>
+                </c:otherwise>
+            </c:choose>
+        </div>
     </div>
 </body>
 </html>
