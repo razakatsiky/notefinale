@@ -50,10 +50,15 @@ body {
 }
 
 .navbar {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
     text-align: right;
     border-bottom: 1px solid rgba(0, 0, 0, 0.08);
     background: white;
     padding: 8px 32px;
+    z-index: 999;
 }
 
 .navbar-links {
@@ -107,9 +112,9 @@ body {
 }
 
 .main-content {
-    margin-top: 120px;
+    margin-top: 180px;
     padding: 40px 32px;
-    max-width: 900px;
+    max-width: 600px;
     margin-left: auto;
     margin-right: auto;
 }
@@ -158,35 +163,6 @@ a {
 a:hover {
     border-bottom-color: black;
     text-decoration: none;
-}
-
-/* Tables minimalistes */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 32px 0;
-    font-size: 0.95rem;
-}
-
-th, td {
-    border: none;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    padding: 12px 8px;
-    text-align: left;
-    color: black;
-}
-
-th {
-    background-color: transparent;
-    font-weight: 600;
-    border-bottom-width: 2px;
-    text-transform: uppercase;
-    font-size: 0.85rem;
-    letter-spacing: 0.03em;
-}
-
-tr:hover {
-    background-color: rgba(0, 0, 0, 0.02);
 }
 
 /* Formulaires épurés */
@@ -248,6 +224,16 @@ input:focus, textarea:focus, select:focus {
     color: white;
 }
 
+.btn-secondary {
+    border: 1px solid #6c757d;
+    color: #6c757d;
+}
+
+.btn-secondary:hover {
+    background-color: #6c757d;
+    color: white;
+}
+
 .form-group {
     margin-bottom: 20px;
 }
@@ -280,30 +266,37 @@ label {
     color: #e74c3c;
 }
 
-.result {
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    margin-top: 20px;
+.alert {
+    padding: 16px 20px;
     border-radius: 8px;
+    margin-bottom: 20px;
+    font-weight: 500;
 }
 
-.note-finale {
-    font-size: 24px;
-    font-weight: bold;
-    text-align: center;
-    margin: 20px 0;
+.alert-success {
+    border-left: 4px solid #27ae60;
+    background: rgba(39, 174, 96, 0.1);
+    color: #27ae60;
 }
 
-.notes-list {
-    margin-top: 20px;
+.alert-danger {
+    border-left: 4px solid #e74c3c;
+    background: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
 }
 
-.note-item {
+.form-container {
+    background: white;
+    padding: 32px;
+    border-radius: 8px;
     border: 1px solid rgba(0, 0, 0, 0.1);
-    padding: 10px;
-    margin: 5px 0;
-    border-left: 2px solid black;
-    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.form-actions {
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .back-link {
@@ -317,10 +310,6 @@ label {
 
 .back-link:hover {
     border-bottom-color: black;
-}
-
-.actions {
-    white-space: nowrap;
 }
 
 /* Responsive */
@@ -368,49 +357,50 @@ label {
             <h1>${title}</h1>
         </div>
         
-        <div class="nav">
-            <a href="/forage">Accueil</a>
-            <a href="/forage/clients">Clients</a>
-            <a href="/forage/demandes">Demandes</a>
+        <div class="navbar">
+            <div class="navbar-links">
+                <a href="/forage" class="nav-button">Accueil</a>
+                <a href="/forage/clients" class="nav-button">Clients</a>
+                <a href="/forage/demandes" class="nav-button">Demandes</a>
+                <a href="/forage/statuts" class="nav-button">Statuts</a>
+            </div>
         </div>
         
-        <form action="/forage/demandes" method="post">
-            <c:if test="${demande.id != null}">
-                <input type="hidden" name="id" value="${demande.id}">
+        <div class="main-content">
+            <c:if test="${not empty success}">
+                <div class="alert alert-success">${success}</div>
+            </c:if>
+            <c:if test="${not empty error}">
+                <div class="alert alert-danger">${error}</div>
             </c:if>
             
-            <div class="form-group">
-                <label for="clientId">Client *</label>
-                <select id="clientId" name="clientId" required>
-                    <option value="">Sélectionnez un client</option>
-                    <c:forEach var="client" items="${clients}">
-                        <option value="${client.id}" ${not empty demande.client and demande.client.id == client.id ? 'selected' : ''}>
-                            ${client.nom}
-                        </option>
-                    </c:forEach>
-                </select>
+            <div class="form-container">
+                <form action="<c:if test="${statut.id != null}">/forage/statuts/update/${statut.id}</c:if><c:if test="${statut.id == null}">/forage/statuts</c:if>" 
+                      method="post">
+                    
+                    <div class="form-group">
+                        <label for="nom">Nom du statut :</label>
+                        <input type="text" 
+                               id="nom" 
+                               name="nom" 
+                               value="${statut.nom}"
+                               required 
+                               maxlength="50"
+                               placeholder="Ex: créé, en cours, terminé...">
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-success">
+                            <c:if test="${statut.id == null}">Ajouter</c:if>
+                            <c:if test="${statut.id != null}">Modifier</c:if>
+                        </button>
+                        <a href="/forage/statuts" class="btn btn-secondary">Annuler</a>
+                    </div>
+                </form>
             </div>
             
-            <div class="form-group">
-                <label for="dateDemande">Date de la demande</label>
-                <input type="date" id="dateDemande" name="dateDemande" required value="${demande.dateDemande}">
-            </div>
-            
-            <div class="form-group">
-                <label for="lieu">Lieu *</label>
-                <input type="text" id="lieu" name="lieu" value="${demande.lieu}" required placeholder="Entrez le lieu du forage">
-            </div>
-            
-            <div class="form-group">
-                <label for="description">Description</label>
-                <textarea id="description" name="description" placeholder="Décrivez la demande de forage...">${demande.description}</textarea>
-            </div>
-            
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Enregistrer</button>
-                <a href="/forage/demandes" class="btn btn-secondary">Annuler</a>
-            </div>
-        </form>
+            <a href="/forage/statuts" class="back-link">← Retour à la liste des statuts</a>
+        </div>
     </div>
 </body>
 </html>

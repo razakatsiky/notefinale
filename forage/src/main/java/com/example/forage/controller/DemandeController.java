@@ -2,8 +2,10 @@ package com.example.forage.controller;
 
 import com.example.forage.model.Client;
 import com.example.forage.model.Demande;
+import com.example.forage.model.DemandeStatut;
 import com.example.forage.service.ClientService;
 import com.example.forage.service.DemandeService;
+import com.example.forage.service.StatutService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,7 +13,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/forage/demandes")
@@ -23,10 +28,31 @@ public class DemandeController {
     @Autowired
     private ClientService clientService;
     
+    @Autowired
+    private StatutService statutService;
+    
     @GetMapping
     public String listDemandes(Model model) {
         List<Demande> demandes = demandeService.getAllDemandes();
+        
+        // Récupérer les statuts actuels pour chaque demande et créer un Map simple
+        Map<Long, String> statutsMap = new HashMap<>();
+        Map<Long, String> datesMap = new HashMap<>();
+        
+        for (Demande demande : demandes) {
+            Optional<DemandeStatut> currentStatut = demandeService.getCurrentStatut(demande.getId());
+            if (currentStatut.isPresent()) {
+                statutsMap.put(demande.getId(), currentStatut.get().getStatut().getNom());
+                datesMap.put(demande.getId(), currentStatut.get().getDateStatut().toString());
+            } else {
+                statutsMap.put(demande.getId(), "Non défini");
+                datesMap.put(demande.getId(), "");
+            }
+        }
+        
         model.addAttribute("demandes", demandes);
+        model.addAttribute("statutsMap", statutsMap);
+        model.addAttribute("datesMap", datesMap);
         model.addAttribute("title", "Liste des Demandes");
         return "forage/demandes/list";
     }
@@ -81,8 +107,8 @@ public class DemandeController {
                     redirectAttributes.addFlashAttribute("error", "Demande non trouvée");
                 }
             } else {
-                // C
-                demandeService.saveDemande(demande);
+                // C - utilisation automatique du statut "créé"
+                demandeService.saveDemandeWithStatut(demande);
                 redirectAttributes.addFlashAttribute("success", "Demande ajoutée avec succès");
             }
         } catch (Exception e) {

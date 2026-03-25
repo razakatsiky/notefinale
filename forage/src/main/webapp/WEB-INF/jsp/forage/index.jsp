@@ -377,6 +377,7 @@ label {
             <a href="/forage">Accueil</a>
             <a href="/forage/clients">Clients</a>
             <a href="/forage/demandes">Demandes</a>
+            <a href="/forage/statuts">Statuts</a>
         </div>
         
         <div class="content">
