@@ -9,7 +9,7 @@
     <groupId>com.example</groupId>
     <artifactId>forage</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
 
     <name>Module Forage</name>
     <description>Module de gestion du forage</description>

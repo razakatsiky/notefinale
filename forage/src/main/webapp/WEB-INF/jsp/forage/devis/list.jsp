@@ -1,12 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${title}</title>
-    <style>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<style>
 /* Élégant CSS minimaliste - Tout en noir */
 * {
     margin: 0;
@@ -50,10 +45,15 @@ body {
 }
 
 .navbar {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
     text-align: right;
     border-bottom: 1px solid rgba(0, 0, 0, 0.08);
     background: white;
     padding: 8px 32px;
+    z-index: 999;
 }
 
 .navbar-links {
@@ -107,7 +107,7 @@ body {
 }
 
 .main-content {
-    margin-top: 120px;
+    margin-top: 180px;
     padding: 40px 32px;
     max-width: 900px;
     margin-left: auto;
@@ -361,14 +361,16 @@ label {
     }
 }
     </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>${title}</h1>
-        </div>
-        
-        <div class="navbar">
+<jsp:include page="../index.jsp">
+    <jsp:param name="title" value="Devis"/>
+</jsp:include>
+
+<div class="container">
+    <div class="header">
+        <h1>Gestion des Devis</h1>
+    </div>
+    
+    <div class="navbar">
             <div class="navbar-links">
                 <a href="/forage/" class="nav-button">Accueil</a>
                 <a href="/forage/clients" class="nav-button">Clients</a>
@@ -378,44 +380,63 @@ label {
                 <a href="/forage/statuts" class="nav-button">Statuts</a>
             </div>
         </div>
-        
-        <form action="/forage/demandes" method="post">
-            <c:if test="${demande.id != null}">
-                <input type="hidden" name="id" value="${demande.id}">
-            </c:if>
-            
-            <div class="form-group">
-                <label for="clientId">Client *</label>
-                <select id="clientId" name="clientId" required>
-                    <option value="">Sélectionnez un client</option>
-                    <c:forEach var="client" items="${clients}">
-                        <option value="${client.id}" ${not empty demande.client and demande.client.id == client.id ? 'selected' : ''}>
-                            ${client.nom}
-                        </option>
-                    </c:forEach>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="dateDemande">Date de la demande</label>
-                <input type="date" id="dateDemande" name="dateDemande" required value="${demande.dateDemande}">
-            </div>
-            
-            <div class="form-group">
-                <label for="lieu">Lieu *</label>
-                <input type="text" id="lieu" name="lieu" value="${demande.lieu}" required placeholder="Entrez le lieu du forage">
-            </div>
-            
-            <div class="form-group">
-                <label for="description">Description</label>
-                <textarea id="description" name="description" placeholder="Décrivez la demande de forage...">${demande.description}</textarea>
-            </div>
-            
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Enregistrer</button>
-                <a href="/forage/demandes" class="btn btn-secondary">Annuler</a>
-            </div>
-        </form>
+    
+    <div class="actions">
+        <a href="/forage/devis/add" class="btn btn-success">Nouveau Devis</a>
     </div>
-</body>
-</html>
+    
+    <c:if test="${not empty successMessage}">
+        <div class="success">
+            ${successMessage}
+        </div>
+    </c:if>
+
+    <c:if test="${not empty errorMessage}">
+        <div class="error">
+            ${errorMessage}
+        </div>
+    </c:if>
+
+    <div>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Client</th>
+                    <th>Lieu</th>
+                    <th>Montant Total</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <c:forEach var="dev" items="${devis}">
+                    <tr>
+                        <td>${dev.id}</td>
+                        <td>
+                            <fmt:formatDate value="${dev.dateDevis}" pattern="dd/MM/yyyy"/>
+                        </td>
+                        <td>${dev.typeDevis.libelle}</td>
+                        <td>${dev.client}</td>
+                        <td>${dev.lieu}</td>
+                        <td style="text-align: right;">
+                            <fmt:formatNumber value="${dev.montantTotalCalcule}" pattern="#,##0.00" currencySymbol="Ar" type="currency"/>
+                        </td>
+                        <td style="text-align: center;">
+                            <a href="${pageContext.request.contextPath}/devis/details/${dev.id}" style="color: black; text-decoration: none; margin: 0 4px; font-weight: 500;">Détails</a>
+                            <!-- <a href="${pageContext.request.contextPath}/devis/edit/${dev.id}" style="color: black; text-decoration: none; margin: 0 4px; font-weight: 500;">Modifier</a> -->
+                            <a href="${pageContext.request.contextPath}/devis/delete/${dev.id}" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce devis ?')" style="color: #dc3545; text-decoration: none; margin: 0 4px; font-weight: 500;">Supprimer</a>
+                        </td>
+                    </tr>
+                </c:forEach>
+            </tbody>
+        </table>
+        
+        <c:if test="${empty devis}">
+            <div class="no-data">
+                Aucun devis trouvé
+            </div>
+        </c:if>
+    </div>
+</div>

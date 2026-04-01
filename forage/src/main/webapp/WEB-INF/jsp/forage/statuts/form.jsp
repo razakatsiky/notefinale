@@ -359,10 +359,12 @@ label {
         
         <div class="navbar">
             <div class="navbar-links">
-                <a href="/forage" class="nav-button">Accueil</a>
-                <a href="/forage/clients" class="nav-button">Clients</a>
-                <a href="/forage/demandes" class="nav-button">Demandes</a>
-                <a href="/forage/statuts" class="nav-button">Statuts</a>
+                <a href="<c:url value='/forage'/>" class="nav-button">Accueil</a>
+                <a href="<c:url value='/forage/clients'/>" class="nav-button">Clients</a>
+                <a href="<c:url value='/forage/demandes'/>" class="nav-button">Demandes</a>
+                <a href="<c:url value='/forage/type-devis'/>" class="nav-button">Types Devis</a>
+                <a href="<c:url value='/forage/devis'/>" class="nav-button">Devis</a>
+                <a href="<c:url value='/forage/statuts'/>" class="nav-button">Statuts</a>
             </div>
         </div>
         

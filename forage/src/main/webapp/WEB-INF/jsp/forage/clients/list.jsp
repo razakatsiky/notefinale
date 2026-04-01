@@ -1,12 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${title}</title>
+<jsp:include page="../index.jsp">
+    <jsp:param name="title" value="${title}"/>
+</jsp:include>
     <style>
 /* Élégant CSS minimaliste - Tout en noir */
 * {
@@ -374,15 +371,19 @@ label {
             <h1>Gestion des Clients</h1>
         </div>
         
-        <div class="nav">
-            <a href="/forage">Accueil</a>
-            <a href="/forage/clients">Clients</a>
-            <a href="/forage/demandes">Demandes</a>
-            <a href="/forage/statuts">Statuts</a>
+        <div class="navbar">
+            <div class="navbar-links">
+                <a href="${pageContext.request.contextPath}/" class="nav-button">Accueil</a>
+                <a href="${pageContext.request.contextPath}/clients" class="nav-button">Clients</a>
+                <a href="${pageContext.request.contextPath}/demandes" class="nav-button">Demandes</a>
+                <a href="${pageContext.request.contextPath}/type-devis" class="nav-button">Types Devis</a>
+                <a href="${pageContext.request.contextPath}/devis" class="nav-button">Devis</a>
+                <a href="${pageContext.request.contextPath}/statuts" class="nav-button">Statuts</a>
+            </div>
         </div>
         
         <div class="actions">
-            <a href="/forage/clients/new" class="btn btn-success">Ajouter un Client</a>
+            <a href="${pageContext.request.contextPath}/clients/new" class="btn btn-success">Ajouter un Client</a>
         </div>
         
         <c:if test="${not empty success}">
@@ -397,7 +398,7 @@ label {
                 <div class="empty-state">
                     <h3>Aucun client trouvé</h3>
                     <p>Commencez par ajouter votre premier client.</p>
-                    <a href="/forage/clients/new" class="btn btn-primary">Ajouter un client</a>
+                    <a href="${pageContext.request.contextPath}/clients/new" class="btn btn-primary">Ajouter un client</a>
                 </div>
             </c:when>
             <c:otherwise>
@@ -417,8 +418,8 @@ label {
                                 <td>${client.nom}</td>
                                 <td>${client.contact}</td>
                                 <td>
-                                    <a href="/forage/clients/edit/${client.id}" class="btn btn-warning">Modifier</a>
-                                    <a href="/forage/clients/delete/${client.id}" 
+                                    <a href="${pageContext.request.contextPath}/clients/edit/${client.id}" class="btn btn-warning">Modifier</a>
+                                    <a href="${pageContext.request.contextPath}/clients/delete/${client.id}" 
                                        class="btn btn-danger" 
                                        onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce client ?')">Supprimer</a>
                                 </td>

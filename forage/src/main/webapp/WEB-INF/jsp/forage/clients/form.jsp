@@ -368,14 +368,18 @@ label {
             <h1>${title}</h1>
         </div>
         
-        <div class="nav">
-            <a href="/forage">Accueil</a>
-            <a href="/forage/clients">Clients</a>
-            <a href="/forage/demandes">Demandes</a>
-
+        <div class="navbar">
+            <div class="navbar-links">
+                <a href="${pageContext.request.contextPath}/" class="nav-button">Accueil</a>
+                <a href="${pageContext.request.contextPath}/clients" class="nav-button">Clients</a>
+                <a href="${pageContext.request.contextPath}/demandes" class="nav-button">Demandes</a>
+                <a href="${pageContext.request.contextPath}/type-devis" class="nav-button">Types Devis</a>
+                <a href="${pageContext.request.contextPath}/devis" class="nav-button">Devis</a>
+                <a href="${pageContext.request.contextPath}/statuts" class="nav-button">Statuts</a>
+            </div>
         </div>
         
-        <form action="/forage/clients" method="post">
+        <form action="${pageContext.request.contextPath}${client.id != null ? '/clients/edit/' : '/clients'}${client.id != null ? client.id : ''}" method="post">
             <c:if test="${client.id != null}">
                 <input type="hidden" name="id" value="${client.id}">
             </c:if>
@@ -392,7 +396,7 @@ label {
             
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">Enregistrer</button>
-                <a href="/forage/clients" class="btn btn-secondary">Annuler</a>
+                <a href="${pageContext.request.contextPath}/clients" class="btn btn-secondary">Annuler</a>
             </div>
         </form>
     </div>
