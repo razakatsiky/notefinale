@@ -374,15 +374,19 @@ label {
             <h1>Gestion des Demandes</h1>
         </div>
         
-        <div class="nav">
-            <a href="/forage">Accueil</a>
-            <a href="/forage/clients">Clients</a>
-            <a href="/forage/demandes">Demandes</a>
-            <a href="/forage/statuts">Statuts</a>
+        <div class="navbar">
+            <div class="navbar-links">
+                <a href="/forage/" class="nav-button">Accueil</a>
+                <a href="/forage/clients" class="nav-button">Clients</a>
+                <a href="/forage/demandes" class="nav-button">Demandes</a>
+                <a href="/forage/type-devis" class="nav-button">Types Devis</a>
+                <a href="/forage/devis" class="nav-button">Devis</a>
+                <a href="/forage/statuts" class="nav-button">Statuts</a>
+            </div>
         </div>
         
         <div class="actions">
-            <a href="/forage/demandes/new" class="btn btn-success">Ajouter une Demande</a>
+            <a href="<c:url value='/demandes/new'/>" class="btn btn-success">Ajouter une Demande</a>
         </div>
         
         <c:if test="${not empty success}">
@@ -397,7 +401,7 @@ label {
                 <div class="empty-state">
                     <h3>Aucune demande trouvée</h3>
                     <p>Commencez par ajouter votre première demande.</p>
-                    <a href="/forage/demandes/new" class="btn btn-primary">Ajouter une demande</a>
+                    <!-- <a href="/demandes/new" class="btn btn-primary">Ajouter une demande</a> -->
                 </div>
             </c:when>
             <c:otherwise>

@@ -27,7 +27,6 @@ public class StatutService {
     }
     
     public Statut saveStatut(Statut statut) {
-        // S'assurer que libelle est initialisé si null
         if (statut.getLibelle() == null) {
             statut.setLibelle(statut.getNom());
         }

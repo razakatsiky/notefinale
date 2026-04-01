@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${title}</title>
-        <style>
+       <style>
 /* Élégant CSS minimaliste - Tout en noir */
 * {
     margin: 0;
@@ -369,24 +369,22 @@ label {
 <body>
     <div class="container">
         <div class="header">
-            <h1>Système de Forage</h1>
-            <p>ETU3637</p>
+            <h1>Système de Forage - ETU3637</h1>
         </div>
         
-        <div class="nav">
-            <a href="/forage">Accueil</a>
-            <a href="/forage/clients">Clients</a>
-            <a href="/forage/demandes">Demandes</a>
-            <a href="/forage/statuts">Statuts</a>
+        <div class="navbar">
+            <div class="navbar-links">
+                <a href="/forage/" class="nav-button">Accueil</a>
+                <a href="/forage/clients" class="nav-button">Clients</a>
+                <a href="/forage/demandes" class="nav-button">Demandes</a>
+                <a href="/forage/type-devis" class="nav-button">Types Devis</a>
+                <a href="/forage/devis" class="nav-button">Devis</a>
+                <a href="/forage/statuts" class="nav-button">Statuts</a>
+            </div>
         </div>
         
         <div class="content">
             <div class="message">${message}</div>
-            
-            <div class="actions">
-                <a href="/forage/clients" class="btn btn-primary">Clients</a>
-                <a href="/forage/demandes" class="btn btn-primary">Demandes</a>
-            </div>
             
         </div>
     </div>

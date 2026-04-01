@@ -36,11 +36,10 @@ public class DemandeService {
     @Transactional
     public Demande saveDemandeWithStatut(Demande demande, String statutIdValue) {
         try {
-            // Sauvegarder la demande
             Demande savedDemande = demandeRepository.save(demande);
             System.out.println("Demande sauvegardée avec ID: " + savedDemande.getId());
             
-            // Si un statut est sélectionné, l'utiliser
+  
             if (statutIdValue != null && !statutIdValue.trim().isEmpty()) {
                 Long statutId = Long.valueOf(statutIdValue);
                 Optional<Statut> selectedStatut = statutService.getStatutById(statutId);
@@ -48,7 +47,7 @@ public class DemandeService {
                 if (selectedStatut.isPresent()) {
                     System.out.println("Utilisation du statut sélectionné: " + selectedStatut.get().getNom());
                     
-                    // Créer l'entrée dans demande_statut
+
                     DemandeStatut demandeStatut = new DemandeStatut(
                         savedDemande, 
                         selectedStatut.get(), 
@@ -85,7 +84,7 @@ public class DemandeService {
                 Statut defaultStatut = new Statut("créé");
                 statutService.saveStatut(defaultStatut);
                 
-                // Créer l'entrée dans demande_statut
+
                 DemandeStatut demandeStatut = new DemandeStatut(
                     savedDemande, 
                     defaultStatut, 

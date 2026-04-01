@@ -1,11 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${title}</title>
+<jsp:include page="../index.jsp">
+    <jsp:param name="title" value="${title}"/>
+</jsp:include>
+
     <style>
 /* Élégant CSS minimaliste - Tout en noir */
 * {
@@ -253,16 +251,6 @@ input:focus, textarea:focus, select:focus {
     color: white;
 }
 
-.btn-warning {
-    border: 1px solid #f39c12;
-    color: #f39c12;
-}
-
-.btn-warning:hover {
-    background-color: #f39c12;
-    color: white;
-}
-
 .form-group {
     margin-bottom: 20px;
 }
@@ -295,42 +283,47 @@ label {
     color: #e74c3c;
 }
 
-.alert {
-    padding: 16px 20px;
+.result {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-top: 20px;
     border-radius: 8px;
-    margin-bottom: 20px;
-    font-weight: 500;
 }
 
-.alert-success {
-    border-left: 4px solid #27ae60;
-    background: rgba(39, 174, 96, 0.1);
-    color: #27ae60;
+.note-finale {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin: 20px 0;
 }
 
-.alert-danger {
-    border-left: 4px solid #e74c3c;
-    background: rgba(231, 76, 60, 0.1);
-    color: #e74c3c;
+.notes-list {
+    margin-top: 20px;
+}
+
+.note-item {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    margin: 5px 0;
+    border-left: 2px solid black;
+    border-radius: 4px;
+}
+
+.back-link {
+    display: inline-block;
+    margin-top: 20px;
+    color: black;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+    transition: border-color 0.2s ease;
+}
+
+.back-link:hover {
+    border-bottom-color: black;
 }
 
 .actions {
     white-space: nowrap;
-}
-
-.empty-state {
-    text-align: center;
-    padding: 60px 20px;
-}
-
-.empty-state h3 {
-    color: #666;
-    margin-bottom: 16px;
-}
-
-.empty-state p {
-    color: #999;
-    margin-bottom: 24px;
 }
 
 /* Responsive */
@@ -380,9 +373,11 @@ label {
         
         <div class="navbar">
             <div class="navbar-links">
-                <a href="/forage" class="nav-button">Accueil</a>
+                <a href="/forage/" class="nav-button">Accueil</a>
                 <a href="/forage/clients" class="nav-button">Clients</a>
                 <a href="/forage/demandes" class="nav-button">Demandes</a>
+                <a href="/forage/type-devis" class="nav-button">Types Devis</a>
+                <a href="/forage/devis" class="nav-button">Devis</a>
                 <a href="/forage/statuts" class="nav-button">Statuts</a>
             </div>
         </div>

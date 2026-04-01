@@ -1,25 +1,33 @@
 package com.example.forage.controller;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.example.forage.model.Client;
 import com.example.forage.model.Demande;
 import com.example.forage.model.DemandeStatut;
 import com.example.forage.service.ClientService;
 import com.example.forage.service.DemandeService;
 import com.example.forage.service.StatutService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @Controller
-@RequestMapping("/forage/demandes")
+@RequestMapping("/demandes")
 public class DemandeController {
     
     @Autowired
@@ -75,7 +83,7 @@ public class DemandeController {
         try {
             if (clientIdValue == null || clientIdValue.trim().isEmpty()) {
                 redirectAttributes.addFlashAttribute("error", "Veuillez sélectionner un client.");
-                return "redirect:/forage/demandes/new";
+                return "redirect:/demandes/new";
             }
 
             Long clientId;
@@ -83,13 +91,13 @@ public class DemandeController {
                 clientId = Long.valueOf(clientIdValue);
             } catch (NumberFormatException e) {
                 redirectAttributes.addFlashAttribute("error", "Client invalide.");
-                return "redirect:/forage/demandes/new";
+                return "redirect:/demandes/new";
             }
 
             Client client = clientService.getClientById(clientId).orElse(null);
             if (client == null) {
                 redirectAttributes.addFlashAttribute("error", "Client non trouvé.");
-                return "redirect:/forage/demandes/new";
+                return "redirect:/demandes/new";
             }
             demande.setClient(client);
             
@@ -114,7 +122,7 @@ public class DemandeController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Erreur: " + e.getMessage());
         }
-        return "redirect:/forage/demandes";
+        return "redirect:/demandes";
     }
     
     @GetMapping("/edit/{id}")
@@ -123,7 +131,7 @@ public class DemandeController {
             Demande demande = demandeService.getDemandeById(id).orElse(null);
             if (demande == null) {
                 redirectAttributes.addFlashAttribute("error", "Demande non trouvée");
-                return "redirect:/forage/demandes";
+                return "redirect:/demandes";
             }
             model.addAttribute("demande", demande);
             model.addAttribute("clients", clientService.getAllClients());
@@ -131,7 +139,7 @@ public class DemandeController {
             return "forage/demandes/form";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Erreur: " + e.getMessage());
-            return "redirect:/forage/demandes";
+            return "redirect:/demandes";
         }
     }
     
@@ -143,6 +151,61 @@ public class DemandeController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Erreur lors de la suppression de la demande: " + e.getMessage());
         }
-        return "redirect:/forage/demandes";
+        return "redirect:/demandes";
+    }
+    
+    @GetMapping(value = "/search", produces = "application/json")
+    @ResponseBody
+    public List<Map<String, Object>> searchDemandes(@RequestParam(value = "q", required = false, defaultValue = "") String q) {
+        System.out.println("=== SEARCH DEMANDES ===");
+        System.out.println("Query: '" + q + "'");
+        
+        List<Demande> allDemandes = demandeService.getAllDemandes();
+        System.out.println("Total demandes in DB: " + allDemandes.size());
+        
+        List<Map<String, Object>> results = new ArrayList<>();
+        
+        if (q == null || q.trim().isEmpty()) {
+            System.out.println("Empty query, returning all demandes");
+            for (Demande d : allDemandes) {
+                results.add(createDemandeMap(d));
+            }
+        } else {
+            String query = q.toLowerCase().trim();
+            System.out.println("Searching with query: '" + query + "'");
+            for (Demande demande : allDemandes) {
+                String description = demande.getDescription() != null ? demande.getDescription().toLowerCase() : "";
+                String clientNom = demande.getClient().getNom().toLowerCase();
+                String lieu = demande.getLieu() != null ? demande.getLieu().toLowerCase() : "";
+                
+                boolean matches = description.contains(query) || 
+                                clientNom.contains(query) || 
+                                lieu.contains(query);
+                
+                System.out.println("Checking ID " + demande.getId() + ": desc='" + description + "', client='" + clientNom + "', lieu='" + lieu + "', match=" + matches);
+                
+                if (matches) {
+                    results.add(createDemandeMap(demande));
+                }
+            }
+        }
+        
+        System.out.println("Results found: " + results.size());
+        return results;
+    }
+    
+    private Map<String, Object> createDemandeMap(Demande demande) {
+        Map<String, Object> result = new HashMap<>();
+        result.put("id", demande.getId());
+        result.put("client", Map.of(
+            "nom", demande.getClient().getNom(),
+            "contact", demande.getClient().getContact() != null ? demande.getClient().getContact() : ""
+        ));
+        result.put("lieu", demande.getLieu());
+        result.put("dateDemande", demande.getDateDemande().toString());
+        result.put("description", demande.getDescription() != null ? demande.getDescription() : "");
+        result.put("displayText", demande.getDescription() != null && !demande.getDescription().trim().isEmpty() 
+            ? demande.getDescription() : demande.getClient().getNom() + " - " + demande.getLieu());
+        return result;
     }
 }
